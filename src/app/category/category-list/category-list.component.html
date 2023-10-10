@@ -1,1 +1,43 @@
-Category List
+<ion-header role="banner" class="md header-md header-collapse-none hydrated"><!---->
+  <ion-toolbar class="toolbar-title-default md in-toolbar hydrated">
+    <ion-buttons slot="start" class="buttons-first-slot sc-ion-buttons-md-h sc-ion-buttons-md-s md hydrated">
+      <ion-menu-button aria-hidden="true"
+                       class="md button menu-button-hidden in-toolbar ion-activatable ion-focusable hydrated">
+
+      </ion-menu-button>
+    </ion-buttons>
+    <ion-title class="md title-default hydrated">Categories</ion-title><!---->
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-row>
+    <ion-col>
+      <ion-list>
+        <ion-item class="item-has-start-slot item md item-lines-default item-fill-none in-list hydrated item-label">
+          <ion-icon name="swap-vertical" slot="start" role="img" class="md hydrated"></ion-icon>
+          <ion-select interface="popover">
+            <ion-select-option value="A-Z">Name A-Z</ion-select-option>
+            <ion-select-option value="Z-A">Name Z-A</ion-select-option>
+            <ion-select-option value="newest">Created at (newest first)</ion-select-option>
+            <ion-select-option value="oldest">Created at (oldest first)</ion-select-option>
+          </ion-select>
+
+        </ion-item>
+      </ion-list>
+    </ion-col>
+    <ion-col>
+      <ion-item class="item-has-start-slot item md item-lines-default item-fill-none in-list hydrated item-label">
+        <ion-searchbar>
+
+        </ion-searchbar>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-list inset="true" role="list" class="md list-md list-inset hydrated"><!---->
+    <ion-item class="item-has-start-slot item md item-lines-default item-fill-none in-list hydrated item-label"
+              role="listitem">
+      <ion-icon slot="start" name="alert-circle-outline" role="img" class="md hydrated"></ion-icon>
+      <ion-label class="sc-ion-label-md-h sc-ion-label-md-s md hydrated"> No categories found</ion-label>
+    </ion-item><!----><!---->
+  </ion-list>
+</ion-content>
