@@ -2,10 +2,13 @@
 // Paging
 // ------
 
-export interface PagingCriteria {
+export interface SortCriteria {
+  sort: string;
+}
+
+export interface PagingCriteria extends SortCriteria {
   page: number;
   size: number;
-  sort: string;
 }
 
 export interface Page<T> {
@@ -29,7 +32,6 @@ export interface SortOption {
 
 export interface Category {
   id?: string;
-  color: string;
   name: string;
 }
 
@@ -37,30 +39,9 @@ export interface CategoryCriteria extends PagingCriteria {
   name?: string;
 }
 
-// -------
-// Expense
-// -------
-
-export interface Expense {
-  id: string;
-  createdAt: string;
-  lastModifiedAt: string;
-  amount: number;
-  category: Category;
-  date: string;
-  name: string;
-}
-
-export interface ExpenseUpsertDto {
-  id?: string;
-  amount: number;
-  categoryId: string;
-  date: string;
-  name: string;
-}
-
-export interface ExpenseCriteria extends PagingCriteria {
-  categoryIds?: string;
+export interface AllCategoryCriteria extends SortCriteria {
   name?: string;
-  yearMonth?: string;
+}
+
+export class Expense {
 }
