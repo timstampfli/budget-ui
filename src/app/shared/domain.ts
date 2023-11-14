@@ -44,4 +44,18 @@ export interface AllCategoryCriteria extends SortCriteria {
 }
 
 export class Expense {
+
+}
+
+export interface Expense{
+  id?: string;
+  name: string;
+}
+
+export interface ExpenseCriteria extends PagingCriteria {
+  name?: string;
+}
+
+export interface AllExpenseCriteria extends SortCriteria {
+  name?: string;
 }
