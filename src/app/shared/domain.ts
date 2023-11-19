@@ -50,6 +50,11 @@ export class Expense {
 export interface Expense{
   id?: string;
   name: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  amount: number;
 }
 
 export interface ExpenseCriteria extends PagingCriteria {

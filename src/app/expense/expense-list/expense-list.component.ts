@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { addMonths, set } from 'date-fns';
 import {InfiniteScrollCustomEvent, ModalController, RefresherCustomEvent} from '@ionic/angular';
 import { ExpenseModalComponent } from '../expense-modal/expense-modal.component';
-import {Expense, ExpenseCriteria, SortOption} from '../../shared/domain';
+import {Expense, ExpenseCriteria, Page, SortOption} from '../../shared/domain';
 import { CategoryService } from '../../category/category.service';
 import { ToastService } from '../../shared/service/toast.service';
 import { ExpenseService } from '../expense.service';
@@ -15,6 +15,13 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class ExpenseListComponent {
   date = set(new Date(), { date: 1 });
+
+  currentMonth: Date = new Date();
+
+  changeMonth(months: number): void {
+    this.currentMonth = addMonths(this.currentMonth, months);
+    this.loadExpenses();
+  }
   expenses: Expense[] | null = null;
   readonly initialSort = 'date,desc';
   lastPageReached = false;
@@ -75,7 +82,7 @@ export class ExpenseListComponent {
     console.log('role', role);
   }
 
-  private loadExpenses(next: () => void = () => {}): void {
+  private loadExpenses(next: (expensesResponse: Page<Expense>) => void = () => {}): void {
     if (!this.searchCriteria.name) delete this.searchCriteria.name;
     this.loading = true;
     // Assuming you have an 'expenseService' for fetching expenses
@@ -84,18 +91,25 @@ export class ExpenseListComponent {
       .pipe(
         finalize(() => {
           this.loading = false;
-          next();
+          next({
+            content: [],
+            last: false,
+            totalElements: 0
+            }
+
+          );
         }),
       )
       .subscribe({
-        next: (expenses) => {
+        next: (expensesResponse: Page<Expense>) => {
           if (this.searchCriteria.page === 0 || !this.expenses) this.expenses = [];
-          this.expenses.push(...expenses.content);
-          this.lastPageReached = expenses.last;
+          this.expenses.push(...expensesResponse.content);
+          this.lastPageReached = expensesResponse.last;
         },
         error: (error) => this.toastService.displayErrorToast('Could not load expenses', error),
       });
   }
+
 
   ionViewDidEnter(): void {
     this.loadExpenses();

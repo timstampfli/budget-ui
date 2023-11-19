@@ -13,11 +13,11 @@ export class ExpenseService {
 
   // Read
 
-  getExpenses = (pagingExpense: CategoryCriteria): Observable<Page<Category>> =>
-    this.httpClient.get<Page<Category>>(this.apiUrl, { params: new HttpParams({ fromObject: { ...pagingExpense } }) });
+  getExpenses = (pagingExpense: CategoryCriteria): Observable<Page<Expense>> =>
+    this.httpClient.get<Page<Expense>>(this.apiUrl, { params: new HttpParams({ fromObject: { ...pagingExpense } }) });
 
   getAllExpenses = (sortCriteria: AllCategoryCriteria): Observable<Category[]> =>
-    this.httpClient.get<Category[]>(this.apiV2Url, { params: new HttpParams({ fromObject: { ...sortCriteria } }) });
+    this.httpClient.get<Expense[]>(this.apiV2Url, { params: new HttpParams({ fromObject: { ...sortCriteria } }) });
 
   // Create & Update
 

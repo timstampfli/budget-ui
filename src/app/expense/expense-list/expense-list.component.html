@@ -30,7 +30,7 @@
         <ion-item>
           <ion-icon name="pricetag" slot="start"></ion-icon>
           <ion-select interface="popover" formControlName="category" placeholder="Categories">
-            <ion-select-option *ngFor="let category of categories" [value]="category" >
+            <ion-select-option *ngFor="let category of categories" [value]="category">
               {{category}}
             </ion-select-option>
           </ion-select>
@@ -65,9 +65,26 @@
 
     <!-- Expenses -->
     <ng-container *ngSwitchDefault>
-      <ion-item button="true" *ngFor="let expense of expenses" [detail]="true" [disabled]="loading" (click)="openModal(expense)">
-        <!--  <ion-label>{{expense.name}}</ion-label>-->
-        <!--<ion-note slot="end">{{expense.amount | currency}}</ion-note>-->
+
+      <ion-item button="true" *ngFor="let expense of expenses" [detail]="true" [disabled]="loading"
+                (click)="openModal(expense)">
+        <ion-label>
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12" size-sm="4">
+                {{expense.name}}
+              </ion-col>
+              <ion-col size="12" size-sm="4">
+                <ion-icon name="pricetag"></ion-icon>
+                {{expense.category.name}}
+              </ion-col>
+              <ion-col size="12" size-sm="4">
+
+               {{expense.amount | currency}}
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-label>
       </ion-item>
     </ng-container>
   </ion-list>
@@ -88,5 +105,21 @@
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
 </ion-content>
+
+<!-- Create month navigation -->
+<ion-footer>
+  <ion-toolbar slot="fixed">
+    <ion-buttons slot="start">
+      <ion-button (click)="changeMonth(-1)">
+        <ion-icon slot="icon-only" name="arrow-back" role="img"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ currentMonth | date: 'MMMM yyyy' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="changeMonth(1)">
+        <ion-icon slot="icon-only" name="arrow-forward" role="img"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
