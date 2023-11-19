@@ -65,7 +65,6 @@
 
     <!-- Expenses -->
     <ng-container *ngSwitchDefault>
-
       <ion-item button="true" *ngFor="let expense of expenses" [detail]="true" [disabled]="loading"
                 (click)="openModal(expense)">
         <ion-label>
@@ -74,12 +73,11 @@
               <ion-col size="12" size-sm="4">
                 {{expense.name}}
               </ion-col>
-              <ion-col size="12" size-sm="4">
+              <ion-col size="12" size-sm="4" class="ion-text-center">
                 <ion-icon name="pricetag"></ion-icon>
                 {{expense.category.name}}
               </ion-col>
-              <ion-col size="12" size-sm="4">
-
+              <ion-col size="12" size-sm="4" class="ion-text-end">
                {{expense.amount | currency}}
               </ion-col>
             </ion-row>
