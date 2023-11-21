@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {ModalController, RefresherCustomEvent} from '@ionic/angular';
 import {filter, finalize, from, mergeMap, tap} from 'rxjs';
-import { ActionSheetService } from '../../shared/service/action-sheet.service';
+import {ActionSheetService} from '../../shared/service/action-sheet.service';
 import {Category, CategoryCriteria, Expense} from "../../shared/domain";
 import {ExpenseService} from "../expense.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ToastService} from "../../shared/service/toast.service";
-import { CategoryService } from "../../category/category.service";
+import {CategoryService} from "../../category/category.service";
 import {CategoryModalComponent} from "../../category/category-modal/category-modal.component";
 
 @Component({
@@ -21,6 +21,7 @@ export class ExpenseModalComponent {
   readonly initialSort = 'name,asc';
   searchCriteria: CategoryCriteria = {page: 0, size: 25, sort: this.initialSort};
   categories: string[] = []; // Assuming you have an array of category names
+
   constructor(
     private readonly actionSheetService: ActionSheetService,
     private readonly expenseService: ExpenseService,
@@ -28,16 +29,20 @@ export class ExpenseModalComponent {
     private readonly modalCtrl: ModalController,
     private readonly toastService: ToastService,
     private readonly categoryService: CategoryService,
+    private modalController: ModalController,
   ) {
     this.expenseForm = this.formBuilder.group({
       id: [], // hidden
       name: ['', [Validators.required, Validators.maxLength(40)]],
+      category: [''],
+      date: [''],
+      amount: [''],
     });
     this.loadCategories();
   }
 
   async loadCategories() {
-    this.categoryService.getCategories({ page: 0, size: 100, sort: 'name,asc' }).subscribe({
+    this.categoryService.getCategories({page: 0, size: 100, sort: 'name,asc'}).subscribe({
       next: (categories) => {
         this.categories = categories.content.map((category) => category.name);
       },
@@ -77,24 +82,39 @@ export class ExpenseModalComponent {
           this.modalCtrl.dismiss(null, 'refresh');
         },
         error: (error) => this.toastService.displayErrorToast('Could not delete category', error),
-      });  }
+      });
+  }
 
   async showExpenseModal(): Promise<void> {
-    const ExpenseModal = await this.modalCtrl.create({ component: ExpenseModalComponent });
+    const ExpenseModal = await this.modalCtrl.create({component: ExpenseModalComponent});
     ExpenseModal.present();
-    const { role } = await ExpenseModal.onWillDismiss();
+    const {role} = await ExpenseModal.onWillDismiss();
     console.log('role', role);
   }
 
 
   ionViewWillEnter(): void {
     this.expenseForm.patchValue(this.expense);
+
+    const dateFormControl = this.expenseForm.get('date');
+    if (dateFormControl && this.expense && 'date' in this.expense && this.expense.date) {
+      const dateObject = new Date(this.expense.date);
+      if (!isNaN(dateObject.getTime())) {
+        const formattedDate = dateObject.toISOString().slice(0, 10);
+        dateFormControl.setValue(formattedDate);
+      }
+    }
+
+    const categoryFormControl = this.expenseForm.get('category');
+    if (categoryFormControl && this.expense && 'category' in this.expense && this.expense.category) {
+      categoryFormControl.setValue(this.expense.category.name);
+    }
   }
 
   async openModal(category?: Category): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: CategoryModalComponent,
-      componentProps: { category: category ? { ...category } : {} },
+      componentProps: {category: category ? {...category} : {}},
     });
     modal.present();
     const {role} = await modal.onWillDismiss();
@@ -109,5 +129,18 @@ export class ExpenseModalComponent {
       $event.target.complete();
     }
   }
+
   protected readonly Expense = Expense;
+
+  updateExpenseDate(param: any) {
+
+  }
+
+  async openCategoryModal() {
+    const categoryModal = await this.modalController.create({
+      component: CategoryModalComponent,
+    });
+    await categoryModal.present();
+  }
+
 }

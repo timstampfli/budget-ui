@@ -51,7 +51,7 @@
     </ion-select>
     <ion-item>
       <ion-button slot="end">
-        <ion-icon slot="icon-only" name="add"  (click)="openModal()"></ion-icon>
+        <ion-icon name="add" (click)="openCategoryModal()"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-item>
@@ -69,14 +69,19 @@
   </ion-item>
   <ion-item>
     <ion-icon name="calendar" slot="start"></ion-icon>
-    <ion-datetime-button>
-
-    </ion-datetime-button>
+    <ion-datetime
+      id="datetime"
+      formControlName="date"
+      presentation="date"
+    ></ion-datetime>
   </ion-item>
+
+</ion-content>
+<ion-footer>
   <ion-fab *ngIf="expense.id" slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="delete()" color="danger" [disabled]="submitting">
       <ion-icon name="trash"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-</ion-content>
+</ion-footer>
 

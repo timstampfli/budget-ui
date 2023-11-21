@@ -55,6 +55,7 @@ export interface Expense{
     name: string;
   };
   amount: number;
+  date: Date;
 }
 
 export interface ExpenseCriteria extends PagingCriteria {
