@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ModalController, RefresherCustomEvent} from '@ionic/angular';
 import {filter, finalize, from, mergeMap, tap} from 'rxjs';
 import {ActionSheetService} from '../../shared/service/action-sheet.service';
@@ -13,14 +13,15 @@ import {CategoryModalComponent} from "../../category/category-modal/category-mod
   selector: 'app-expense-modal',
   templateUrl: './expense-modal.component.html',
 })
-export class ExpenseModalComponent {
+export class ExpenseModalComponent implements OnInit{
   readonly expenseForm: FormGroup;
   submitting = false;
 
   expense: Expense = {} as Expense;
   readonly initialSort = 'name,asc';
   searchCriteria: CategoryCriteria = {page: 0, size: 25, sort: this.initialSort};
-  categories: string[] = []; // Assuming you have an array of category names
+  categories: Category[] = []; // Assuming you have an array of category names
+  openDatePickerBool: boolean = false;
 
   constructor(
     private readonly actionSheetService: ActionSheetService,
@@ -38,13 +39,19 @@ export class ExpenseModalComponent {
       date: [''],
       amount: [''],
     });
-    this.loadCategories();
   }
 
+  async ngOnInit(): Promise<void> {
+        await this.loadCategories();
+    }
+
   async loadCategories() {
-    this.categoryService.getCategories({page: 0, size: 100, sort: 'name,asc'}).subscribe({
+    console.log("load");
+    this.categoryService.getAllCategories({name:'', sort: 'name,asc'}).subscribe({
       next: (categories) => {
-        this.categories = categories.content.map((category) => category.name);
+        console.log("categories:");
+        this.categories.push(...categories);
+        console.log(this.categories);
       },
       error: (error) => this.toastService.displayErrorToast('Could not load categories', error),
     });
@@ -54,22 +61,25 @@ export class ExpenseModalComponent {
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  save(): void {
+   save(): void {
     this.submitting = true;
+    let exp = this.expenseForm.value as Expense;
+
+    exp.categoryId = exp.category.id;
     this.expenseService
-      .upsertExpense(this.expenseForm.value)
+      .upsertExpense(exp)
       .pipe(finalize(() => (this.submitting = false)))
       .subscribe({
         next: () => {
-          this.toastService.displaySuccessToast('Category saved');
+          this.toastService.displaySuccessToast('Expense saved');
           this.modalCtrl.dismiss(null, 'refresh');
         },
-        error: (error) => this.toastService.displayErrorToast('Could not save category', error),
+        error: (error) => this.toastService.displayErrorToast('Could not save expense', error),
       });
   }
 
   delete(): void {
-    from(this.actionSheetService.showDeletionConfirmation('Are you sure you want to delete this category?'))
+    from(this.actionSheetService.showDeletionConfirmation('Are you sure you want to delete this expense?'))
       .pipe(
         filter((action) => action === 'delete'),
         tap(() => (this.submitting = true)),
@@ -78,10 +88,10 @@ export class ExpenseModalComponent {
       )
       .subscribe({
         next: () => {
-          this.toastService.displaySuccessToast('Category deleted');
+          this.toastService.displaySuccessToast('Expense deleted');
           this.modalCtrl.dismiss(null, 'refresh');
         },
-        error: (error) => this.toastService.displayErrorToast('Could not delete category', error),
+        error: (error) => this.toastService.displayErrorToast('Could not delete expense', error),
       });
   }
 
@@ -96,51 +106,29 @@ export class ExpenseModalComponent {
   ionViewWillEnter(): void {
     this.expenseForm.patchValue(this.expense);
 
-    const dateFormControl = this.expenseForm.get('date');
-    if (dateFormControl && this.expense && 'date' in this.expense && this.expense.date) {
-      const dateObject = new Date(this.expense.date);
-      if (!isNaN(dateObject.getTime())) {
-        const formattedDate = dateObject.toISOString().slice(0, 10);
-        dateFormControl.setValue(formattedDate);
-      }
-    }
 
-    const categoryFormControl = this.expenseForm.get('category');
-    if (categoryFormControl && this.expense && 'category' in this.expense && this.expense.category) {
-      categoryFormControl.setValue(this.expense.category.name);
-    }
   }
 
-  async openModal(category?: Category): Promise<void> {
-    const modal = await this.modalCtrl.create({
-      component: CategoryModalComponent,
-      componentProps: {category: category ? {...category} : {}},
-    });
-    modal.present();
-    const {role} = await modal.onWillDismiss();
-    if (role === 'refresh') this.reloadCategories();
-    console.log('role', role);
-  }
 
-  reloadCategories($event?: RefresherCustomEvent): void {
+
+  async reloadCategories($event?: RefresherCustomEvent): Promise<void> {
     this.searchCriteria.page = 0;
-    this.loadCategories();
+    await this.loadCategories();
     if ($event) {
-      $event.target.complete();
+      await $event.target.complete();
     }
   }
 
-  protected readonly Expense = Expense;
 
-  updateExpenseDate(param: any) {
-
-  }
 
   async openCategoryModal() {
     const categoryModal = await this.modalController.create({
-      component: CategoryModalComponent,
+      component: CategoryModalComponent
     });
     await categoryModal.present();
   }
 
+  openDatePicker() {
+   this.openDatePickerBool = !this.openDatePickerBool;
+  }
 }

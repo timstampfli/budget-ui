@@ -19,10 +19,6 @@
         <ion-icon slot="start" name="save"></ion-icon>
         Save
       </ion-button>
-      <ion-button color="medium" (click)="cancel()" [disabled]="submitting">
-        <ion-icon slot="start" name="close"></ion-icon>
-        Cancel
-      </ion-button>
     </ion-buttons>
 
   </ion-toolbar>
@@ -46,12 +42,12 @@
     <ion-icon name="pricetag" slot="start"></ion-icon>
     <ion-select interface="popover" formControlName="category" placeholder="Categories">
       <ion-select-option *ngFor="let category of categories" [value]="category">
-        {{category}}
+        {{category.name}}
       </ion-select-option>
     </ion-select>
     <ion-item>
-      <ion-button slot="end">
-        <ion-icon name="add" (click)="openCategoryModal()"></ion-icon>
+      <ion-button slot="end" (click)="openCategoryModal()">
+        <ion-icon name="add" ></ion-icon>
       </ion-button>
     </ion-item>
   </ion-item>
@@ -68,20 +64,22 @@
 
   </ion-item>
   <ion-item>
-    <ion-icon name="calendar" slot="start"></ion-icon>
-    <ion-datetime
+
+    <ion-button slot="start" (click)="openDatePicker()">
+      <ion-icon name="calendar" ></ion-icon>
+    </ion-button>
+    <ion-datetime *ngIf="openDatePickerBool"
       id="datetime"
       formControlName="date"
       presentation="date"
     ></ion-datetime>
   </ion-item>
 
-</ion-content>
-<ion-footer>
-  <ion-fab *ngIf="expense.id" slot="fixed" vertical="bottom" horizontal="end">
+<!--  <ion-fab *ngIf="expense.id" slot="fixed" vertical="bottom" horizontal="end">-->
+  <ion-fab  slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="delete()" color="danger" [disabled]="submitting">
       <ion-icon name="trash"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-</ion-footer>
+</ion-content>
 

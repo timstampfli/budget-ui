@@ -43,10 +43,6 @@ export interface AllCategoryCriteria extends SortCriteria {
   name?: string;
 }
 
-export class Expense {
-
-}
-
 export interface Expense{
   id?: string;
   name: string;
@@ -54,6 +50,7 @@ export interface Expense{
     id: string;
     name: string;
   };
+  categoryId?: string;
   amount: number;
   date: Date;
 }

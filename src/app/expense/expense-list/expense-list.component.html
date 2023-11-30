@@ -29,9 +29,9 @@
       <ion-col size="12" size-sm="4">
         <ion-item>
           <ion-icon name="pricetag" slot="start"></ion-icon>
-          <ion-select interface="popover" formControlName="category" placeholder="Categories">
-            <ion-select-option *ngFor="let category of categories" [value]="category">
-              {{category}}
+          <ion-select interface="popover" formControlName="category" placeholder="Categories" [multiple]="true">
+            <ion-select-option *ngFor="let category of categories" [value]="category.name">
+              {{category.name}}
             </ion-select-option>
           </ion-select>
         </ion-item>
@@ -67,8 +67,10 @@
     <ng-container *ngSwitchDefault>
       <ion-item button="true" *ngFor="let expense of expenses" [detail]="true" [disabled]="loading"
                 (click)="openModal(expense)">
-        <ion-label>
           <ion-grid>
+            <ion-row >
+              <ion-label>{{expense.date}}</ion-label>
+            </ion-row>
             <ion-row>
               <ion-col size="12" size-sm="4">
                 {{expense.name}}
@@ -82,7 +84,7 @@
               </ion-col>
             </ion-row>
           </ion-grid>
-        </ion-label>
+
       </ion-item>
     </ng-container>
   </ion-list>

@@ -31,7 +31,7 @@ export class CategoryModalComponent {
   }
 
   cancel(): void {
-    this.modalCtrl.dismiss(null, 'cancel');
+    this.modalCtrl.dismiss(null, 'cancel').then((x) => console.log(x));
   }
 
   save(): void {

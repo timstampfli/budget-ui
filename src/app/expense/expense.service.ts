@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {AllCategoryCriteria, Category, CategoryCriteria, Expense, Page} from '../shared/domain';
+import {
+  AllCategoryCriteria,
+  AllExpenseCriteria,
+  Category,
+  CategoryCriteria,
+  Expense,
+  ExpenseCriteria,
+  Page
+} from '../shared/domain';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -13,10 +21,10 @@ export class ExpenseService {
 
   // Read
 
-  getExpenses = (pagingExpense: CategoryCriteria): Observable<Page<Expense>> =>
+  getExpenses = (pagingExpense: ExpenseCriteria): Observable<Page<Expense>> =>
     this.httpClient.get<Page<Expense>>(this.apiUrl, { params: new HttpParams({ fromObject: { ...pagingExpense } }) });
 
-  getAllExpenses = (sortCriteria: AllCategoryCriteria): Observable<Category[]> =>
+  getAllExpenses = (sortCriteria: AllExpenseCriteria): Observable<Expense[]> =>
     this.httpClient.get<Expense[]>(this.apiV2Url, { params: new HttpParams({ fromObject: { ...sortCriteria } }) });
 
   // Create & Update
