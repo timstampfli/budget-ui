@@ -29,8 +29,8 @@
       <ion-col size="12" size-sm="4">
         <ion-item>
           <ion-icon name="pricetag" slot="start"></ion-icon>
-          <ion-select interface="popover" formControlName="category" placeholder="Categories" [multiple]="true">
-            <ion-select-option *ngFor="let category of categories" [value]="category.name">
+          <ion-select interface="popover" formControlName="categoryIds" placeholder="Categories" [multiple]="true">
+            <ion-select-option *ngFor="let category of categories" [value]="category.id">
               {{category.name}}
             </ion-select-option>
           </ion-select>
@@ -47,7 +47,7 @@
   </ion-grid>
 
   <!-- Expense List -->
-  <ion-list [ngSwitch]="expenses?.length" inset="true">
+  <ion-list [ngSwitch]="expenses.length" inset="true">
     <!-- Skeleton -->
     <ng-container *ngSwitchCase="null">
       <ion-item *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]">
@@ -65,25 +65,24 @@
 
     <!-- Expenses -->
     <ng-container *ngSwitchDefault>
-      <ion-item button="true" *ngFor="let expense of expenses" [detail]="true" [disabled]="loading"
-                (click)="openModal(expense)">
-          <ion-grid>
-            <ion-row >
-              <ion-label>{{expense.date}}</ion-label>
-            </ion-row>
-            <ion-row>
-              <ion-col size="12" size-sm="4">
-                {{expense.name}}
-              </ion-col>
-              <ion-col size="12" size-sm="4" class="ion-text-center">
-                <ion-icon name="pricetag"></ion-icon>
-                {{expense.category.name}}
-              </ion-col>
-              <ion-col size="12" size-sm="4" class="ion-text-end">
-               {{expense.amount | currency}}
-              </ion-col>
-            </ion-row>
-          </ion-grid>
+      <ion-item button="true" *ngFor="let expense of expenses" [detail]="true" [disabled]="loading" (click)="openModal(expense)">
+        <ion-grid>
+          <ion-item-divider>
+            {{expense.date}}
+          </ion-item-divider>
+          <ion-row>
+            <ion-col size="12" size-sm="4">
+              {{expense.name}}
+            </ion-col>
+            <ion-col size="12" size-sm="4" class="ion-text-center">
+              <ion-icon name="pricetag"></ion-icon>
+              {{expense.category.name}}
+            </ion-col>
+            <ion-col size="12" size-sm="4" class="ion-text-end">
+              {{expense.amount | currency}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
 
       </ion-item>
     </ng-container>

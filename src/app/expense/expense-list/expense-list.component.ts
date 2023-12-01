@@ -8,6 +8,7 @@ import { ToastService } from '../../shared/service/toast.service';
 import { ExpenseService } from '../expense.service';
 import { debounce, finalize, interval, Subscription } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import {DatePipe} from "@angular/common";
 
 @Component({
   selector: 'app-expense-overview',
@@ -17,13 +18,13 @@ export class ExpenseListComponent implements OnInit{
   date = set(new Date(), { date: 1 });
 
   currentMonth: Date = new Date();
-
+  datePipe: DatePipe = new DatePipe('en-US');
 
   expenses: Expense[] = [];
   readonly initialSort = 'date,desc';
   lastPageReached = false;
   loading = false;
-  searchCriteria: ExpenseCriteria = { page: 0, size: 25, sort: this.initialSort};
+  searchCriteria: ExpenseCriteria = { page: 0, size: 25, yearMonth: +(this.datePipe.transform(this.currentMonth, 'yyyyMM'))!, sort: this.initialSort};
   readonly searchForm: FormGroup;
   readonly sortOptions: SortOption[] = [
     { label: 'Created at (newest first)', value: 'createdAt,desc' },
@@ -43,7 +44,7 @@ export class ExpenseListComponent implements OnInit{
     private readonly toastService: ToastService,
     private readonly formBuilder: FormBuilder
   ) {
-    this.searchForm = this.formBuilder.group({ name: [], category: [], sort: [this.initialSort] });
+    this.searchForm = this.formBuilder.group({ name: [], categoryIds: [''], sort: [this.initialSort] });
     this.searchFormSubscription = this.searchForm.valueChanges
       .pipe(debounce((value) => interval(value.name?.length ? 400 : 0)))
       .subscribe((value) => {
@@ -54,21 +55,19 @@ export class ExpenseListComponent implements OnInit{
 
   }
 
-    async ngOnInit(): Promise<void> {
-        await this.loadCategories();
-    }
+  async ngOnInit(): Promise<void> {
+    await this.loadCategories();
+  }
 
-    async loadCategories() {
-        console.log("load");
-        this.categoryService.getCategories(this.searchCriteria).subscribe({
-            next: (categories) => {
-                console.log("categories:");
-                this.categories.push(...categories.content);
-                console.log(this.categories);
-            },
-            error: (error) => this.toastService.displayErrorToast('Could not load categories', error),
-        });
-    }
+  async loadCategories() {
+    console.log("load");
+    this.categoryService.getCategories(this.searchCriteria).subscribe({
+      next: (categories) => {
+        this.categories.push(...categories.content);
+      },
+      error: (error) => this.toastService.displayErrorToast('Could not load categories', error),
+    });
+  }
 
 
   addMonths = (number: number): void => {
@@ -77,6 +76,8 @@ export class ExpenseListComponent implements OnInit{
   };
   changeMonth(months: number): void {
     this.currentMonth = addMonths(this.currentMonth, months);
+    const yearMonth = this.datePipe.transform(this.currentMonth, 'yyyyMM');
+    this.searchCriteria = { ...this.searchCriteria, yearMonth: +yearMonth!, page: 0 , sort: 'date,desc'};
     this.loadExpenses();
   }
 
@@ -94,7 +95,7 @@ export class ExpenseListComponent implements OnInit{
   private loadExpenses(next: () => void = () => {}): void {
     if (!this.searchCriteria.name) delete this.searchCriteria.name;
     this.loading = true;
-     this.expenseService
+    this.expenseService
       .getExpenses(this.searchCriteria)
       .pipe(
         finalize(() => {

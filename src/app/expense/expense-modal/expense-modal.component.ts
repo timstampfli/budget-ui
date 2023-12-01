@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ModalController, RefresherCustomEvent} from '@ionic/angular';
+import {IonDatetime, ModalController, RefresherCustomEvent} from '@ionic/angular';
 import {filter, finalize, from, mergeMap, tap} from 'rxjs';
 import {ActionSheetService} from '../../shared/service/action-sheet.service';
 import {Category, CategoryCriteria, Expense} from "../../shared/domain";
@@ -8,6 +8,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ToastService} from "../../shared/service/toast.service";
 import {CategoryService} from "../../category/category.service";
 import {CategoryModalComponent} from "../../category/category-modal/category-modal.component";
+import {DatePipe} from "@angular/common";
 
 @Component({
   selector: 'app-expense-modal',
@@ -16,12 +17,11 @@ import {CategoryModalComponent} from "../../category/category-modal/category-mod
 export class ExpenseModalComponent implements OnInit{
   readonly expenseForm: FormGroup;
   submitting = false;
-
   expense: Expense = {} as Expense;
   readonly initialSort = 'name,asc';
   searchCriteria: CategoryCriteria = {page: 0, size: 25, sort: this.initialSort};
-  categories: Category[] = []; // Assuming you have an array of category names
-  openDatePickerBool: boolean = false;
+  categories: Category[] = [];
+  datePipe = new DatePipe('en-US');
 
   constructor(
     private readonly actionSheetService: ActionSheetService,
@@ -33,25 +33,24 @@ export class ExpenseModalComponent implements OnInit{
     private modalController: ModalController,
   ) {
     this.expenseForm = this.formBuilder.group({
-      id: [], // hidden
+      id: [],
       name: ['', [Validators.required, Validators.maxLength(40)]],
-      category: [''],
-      date: [''],
+      categoryId: [this.expense.categoryId],
+      date: [this.datePipe.transform(Date.now(), 'yyyy-MM-ddThh:mm:ss')],
       amount: [''],
     });
   }
 
   async ngOnInit(): Promise<void> {
-        await this.loadCategories();
-    }
+    await this.loadCategories();
+    this.expense.categoryId = this.expense.category.id;
+  }
 
   async loadCategories() {
     console.log("load");
     this.categoryService.getAllCategories({name:'', sort: 'name,asc'}).subscribe({
       next: (categories) => {
-        console.log("categories:");
         this.categories.push(...categories);
-        console.log(this.categories);
       },
       error: (error) => this.toastService.displayErrorToast('Could not load categories', error),
     });
@@ -61,11 +60,9 @@ export class ExpenseModalComponent implements OnInit{
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-   save(): void {
+  save(): void {
     this.submitting = true;
     let exp = this.expenseForm.value as Expense;
-
-    exp.categoryId = exp.category.id;
     this.expenseService
       .upsertExpense(exp)
       .pipe(finalize(() => (this.submitting = false)))
@@ -95,12 +92,7 @@ export class ExpenseModalComponent implements OnInit{
       });
   }
 
-  async showExpenseModal(): Promise<void> {
-    const ExpenseModal = await this.modalCtrl.create({component: ExpenseModalComponent});
-    ExpenseModal.present();
-    const {role} = await ExpenseModal.onWillDismiss();
-    console.log('role', role);
-  }
+
 
 
   ionViewWillEnter(): void {
@@ -126,9 +118,8 @@ export class ExpenseModalComponent implements OnInit{
       component: CategoryModalComponent
     });
     await categoryModal.present();
+
   }
 
-  openDatePicker() {
-   this.openDatePickerBool = !this.openDatePickerBool;
-  }
+
 }

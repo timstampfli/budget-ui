@@ -57,6 +57,7 @@ export interface Expense{
 
 export interface ExpenseCriteria extends PagingCriteria {
   name?: string;
+  yearMonth?: number;
 }
 
 export interface AllExpenseCriteria extends SortCriteria {
