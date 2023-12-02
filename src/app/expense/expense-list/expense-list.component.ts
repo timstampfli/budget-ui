@@ -69,7 +69,6 @@ export class ExpenseListComponent implements OnInit{
     });
   }
 
-
   addMonths = (number: number): void => {
     this.date = addMonths(this.date, number);
     this.loadExpenses();
@@ -114,7 +113,6 @@ export class ExpenseListComponent implements OnInit{
         error: (error) => this.toastService.displayErrorToast('Could not load expenses', error),
       });
   }
-
 
   ionViewDidEnter(): void {
     this.loadExpenses();

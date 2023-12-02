@@ -92,16 +92,11 @@ export class ExpenseModalComponent implements OnInit{
       });
   }
 
-
-
-
   ionViewWillEnter(): void {
     this.expenseForm.patchValue(this.expense);
 
 
   }
-
-
 
   async reloadCategories($event?: RefresherCustomEvent): Promise<void> {
     this.searchCriteria.page = 0;
@@ -111,8 +106,6 @@ export class ExpenseModalComponent implements OnInit{
     }
   }
 
-
-
   async openCategoryModal() {
     const categoryModal = await this.modalController.create({
       component: CategoryModalComponent
@@ -120,6 +113,5 @@ export class ExpenseModalComponent implements OnInit{
     await categoryModal.present();
 
   }
-
 
 }
